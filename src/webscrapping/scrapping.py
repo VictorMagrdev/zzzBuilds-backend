@@ -31,7 +31,10 @@ for img in imagenes:
 
         # Descargar la imagen
         response_img = requests.get(url_img)
-        with open(os.path.join(directorio, os.path.basename(url_img)), "wb") as f:
+        image_name = os.path.basename(url_img)  # Obtiene solo el nombre del archivo
+        with open(os.path.join(directorio, image_name), "wb") as f:
             f.write(response_img.content)
 
         print(f"Imagen descargada: {url_img}")
+
+# Al final del archivo, puedes llamar a la conexión a la base de datos.

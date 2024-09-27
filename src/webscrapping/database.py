@@ -1,6 +1,7 @@
 import os
 import mysql.connector
 
+# Conectar a la base de datos
 conexion = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -9,6 +10,7 @@ conexion = mysql.connector.connect(
 
 cursor = conexion.cursor()
 
+# Crear base de datos y tabla si no existen
 cursor.execute("CREATE DATABASE IF NOT EXISTS zzzBuilds")
 cursor.execute("USE zzzBuilds")
 
@@ -26,13 +28,12 @@ for archivo in os.listdir(directorio_imagenes):
     if archivo.endswith(".png"):
         nombre_original = os.path.splitext(archivo)[0]
         nombre_procesado = nombre_original.replace("-", " ")
-        path_imagen = os.path.abspath(
-            os.path.join(directorio_imagenes, archivo))
 
+        # Solo guarda el nombre del archivo
         cursor.execute('''
         INSERT INTO personajes (nombre, imagen)
         VALUES (%s, %s)
-        ''', (nombre_procesado, path_imagen))
+        ''', (nombre_procesado, archivo))  # Cambia aquí para usar solo el nombre del archivo
 
 conexion.commit()
 cursor.close()
