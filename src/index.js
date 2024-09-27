@@ -1,27 +1,29 @@
-import "dotenv/config"
-import cors from "cors"
+import cors from "cors";
 import express from "express";
-import { validateConnection } from "./libs/db.js";
+import path from "path"; 
+import { fileURLToPath } from "url";
 
+import { validateConnection } from "./libs/db.js";
 import { routerApi } from "./routes/index.router.js";
 
 const app = express();
-const port = process.env.PORT;
+const port = 300;
 
-app.use(express.json())
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use('/imagenes', express.static(path.join(__dirname, 'webscrapping/imagenes')));
+
+app.use(express.json());
 
 const whiteList = [];
 const options = {
-  // origin: (origin, callback) => {
-  //   if (whiteList.includes(origin)) callback(null, true)
-  //   else callback(new Error("No permitido"))
-  // }
   origin: "*"
 }
 
-app.use(cors(options))
+app.use(cors(options));
 
-validateConnection()
-routerApi(app)
+validateConnection();
+routerApi(app);
 
 app.listen(port, () => console.log(`Server is running on port ${port}`));

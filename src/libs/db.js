@@ -1,21 +1,31 @@
-import "dotenv/config"
-import mysql2 from "mysql2/promise"
+import * as dotenv from 'dotenv'
+import mysql2 from 'mysql2/promise';
 
-const username = process.env.DB_USER
-const database = process.env.DB_NAME
-const password = process.env.DB_PASS
-const host = process.env.DB_HOST
-const db_port = process.env.DB_PORT
+dotenv.config();
+
+const username = 'root'
+const database = 'zzzbuilds'
+const password = 'ellenjoe'
+const host = 'localhost'
+const db_port = 3306
+
+const USER = encodeURIComponent(username);
+const PASSWORD = encodeURIComponent(password);
 
 
-const USER = encodeURIComponent(username)
-const PASSWORD = encodeURIComponent(password)
+export const pool = mysql2.createPool({
+    host: host,
+    user: USER,
+    password: PASSWORD,
+    database: database,
+    port: db_port, 
+});
 
-const URI = `mysql://${USER}:${PASSWORD}@${host}:${db_port}/${database}`
-
-export const pool = mysql2.createPool({ uri: URI })
-export const validateConnection = () => {
-  pool.query('select 1 + 1')
-  .then(() => console.log('Connection success!'))
-  .catch((error) => console.error('Error connection', error))
-}
+export const validateConnection = async () => {
+    try {
+        await pool.query('SELECT 1 + 1');
+        console.log('Connection success!');
+    } catch (error) {
+        console.error('Error connection:', error);
+    }
+};
