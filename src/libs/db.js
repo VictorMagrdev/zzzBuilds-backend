@@ -1,11 +1,12 @@
 import "dotenv/config"
 import mysql2 from "mysql2/promise"
 
-const username = 'root'
-const database = 'zzzBuilds'
-const password = ''
-const host = 'localhost'
-const db_port = '3306'
+const username = process.env.DB_USER
+const database = process.env.DB_NAME
+const password = process.env.DB_PASS
+const host = process.env.DB_HOST
+const db_port = process.env.DB_PORT
+
 
 const USER = encodeURIComponent(username)
 const PASSWORD = encodeURIComponent(password)
