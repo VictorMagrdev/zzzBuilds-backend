@@ -8,15 +8,20 @@ def obtener_enlaces(url):
     
     contenedor = soup.find(class_="gb-container gb-container-9c65b73c characters")
     lista_enlaces = set()
+    
+    enlaces_excluir = {
+        "https://zenlessdiary.com/characters/anton",
+    }
 
     if contenedor:
         enlaces = contenedor.find_all("a")
         for enlace in enlaces:
             href = enlace.get("href")
-            if href:
+            if href and href not in enlaces_excluir:
                 lista_enlaces.add(href)
 
     return lista_enlaces
+
 
 def crear_directorio(directorio):
     if not os.path.exists(directorio):
