@@ -7,7 +7,7 @@ import { validateConnection } from "./libs/db.js";
 import { routerApi } from "./routes/index.router.js";
 
 const app = express();
-const port = 300;
+const port = 301;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
