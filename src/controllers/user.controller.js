@@ -26,25 +26,23 @@ export const getUserById = (req, res) => {
 
 export const registerUser = async (req, res) => {
   const { name, user, email, password, confirmPassword } = req.body;
-  console.log({ name, user, email, password, confirmPassword });
   if (password !== confirmPassword) {
     return res.status(400).json({ error: 'Las contraseñas no coinciden' });
   }
 
   pool.query(`
     SELECT * FROM usuarios WHERE user = ? OR email = ?
-  `, [email, user])
-  .then(async (existingUser) => {
+  `, [user, email])
+  .then(([existingUser]) => {
+
     if (existingUser.length > 0) {
-      return res.status(400).json({ error: 'El correo o el nombre de usuario ya están registrados' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+      return res.status(400).json({ error: 'El correo o el nombre de usuario ya están registrados'});
+    }   
+    
     pool.query(`
       INSERT INTO usuarios (fullname, user, email, password, state_id)
       VALUES (?, ?, ?, ?, ?)
-    `, [name, email, username, hashedPassword, 1])
+    `, [name, user, email, password, 1])
     .then(() => {      
       res.status(201).json({ message: 'Usuario registrado exitosamente'});
     })
