@@ -1,6 +1,7 @@
 import { pool } from "../libs/db.js";
 
 import { errorHandler } from "../helpers/errorHandler.js";
+import jwt from 'jsonwebtoken';
 
 export const getUserById = (req, res) => {
   const { id_user } = req.params;
@@ -62,29 +63,29 @@ export const loginUser = async (req, res) => {
   pool.query(`
     SELECT * FROM usuarios WHERE email = ?
   `, [email])
-  .then(async (data) => {
+  .then((data) => {
     const user = data[0];
 
-    if (!user) {
+    if (!user[0].email) {
       return res.status(400).json({ error: 'Correo incorrecto' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    if (password !== user[0].password) {
       return res.status(400).json({ error: 'Contraseña incorrecta' });
     }
 
-    const token = jwt.sign({ userId: user.id_user }, 'secretKey', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user[0].id_user }, 'secretKey', { expiresIn: '1h' });
 
     res.json({
       token,
-      user: { id: user.id_user, fullname: user.fullname, user: user.user, email: user.email }
+      user: { id: user[0].id_user, fullname: user[0].fullname, user: user[0].user, email: user[0].email }
     });
   })
   .catch(error => {
     errorHandler(res, 500, "Error al iniciar sesión", error);
   });
 };
+
 
 
 export const getUserProfile = (req, res) => {
