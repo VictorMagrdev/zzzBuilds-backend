@@ -4,7 +4,7 @@ import mysql2 from 'mysql2/promise';
 dotenv.config();
 
 const username = 'root'
-const database = 'zzzbuilds'
+const database = 'zzzbuilds2'
 const password = 'ellenjoe'
 const host = 'localhost'
 const db_port = 3306
