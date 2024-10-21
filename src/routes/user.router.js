@@ -4,9 +4,9 @@ import { getUserById, registerUser, loginUser, getUserProfile, verifyToken } fro
 
 const router = express.Router()
 
+router.get('/profile', verifyToken, getUserProfile)
 router.get('/:id_user', getUserById)
 router.post('/login', loginUser)
 router.post('/register', registerUser)
-router.get('/profile', verifyToken, getUserProfile)
 
 export default router;
