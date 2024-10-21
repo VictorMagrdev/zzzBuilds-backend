@@ -91,7 +91,7 @@ export const getUserProfile = async (req, res) => {
   const userId = req.userId;
 
   pool.query(`
-    SELECT id_user, fullname, user, email, state_id, img_profile
+    SELECT user, img_profile
     FROM usuarios
     WHERE id_user = ?
   `, [userId])
