@@ -7,14 +7,20 @@ import { validateConnection } from "./libs/db.js";
 import { routerApi } from "./routes/index.router.js";
 
 const app = express();
-const port = 301;
+const port = 302;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use('/imagenes', express.static(path.join(__dirname, 'webscrapping/imagenes')));
+app.use('/imagenes/personajes', express.static(path.join(__dirname, 'webscrapping/img_personajes')));
+app.use('/imagenes/usuarios', express.static(path.join(__dirname, 'webscrapping/img_usuarios')));
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log(`Método: ${req.method}, URL: ${req.url}`);
+  next();
+});
 
 const whiteList = [];
 const options = {

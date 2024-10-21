@@ -59,7 +59,7 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
+  
   pool.query(`
     SELECT * FROM usuarios WHERE email = ?
   `, [email])
@@ -87,41 +87,41 @@ export const loginUser = async (req, res) => {
 };
 
 
-
-export const getUserProfile = (req, res) => {
-  const { userId } = req.user;
+export const getUserProfile = async (req, res) => {
+  const userId = req.userId;
 
   pool.query(`
-    SELECT id_user, fullname, user, email, state_id
+    SELECT id_user, fullname, user, email, state_id, img_profile
     FROM usuarios
     WHERE id_user = ?
   `, [userId])
   .then((data) => {
     const user = data[0];
-    if (!user) {
+
+    if (!user || user.length === 0) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    res.json(user);
+    res.json(user[0]); 
   })
   .catch(error => {
-    errorHandler(res, 500, "Error al obtener la información del usuario", error);
+    errorHandler(res, 500, "Error al obtener los datos del usuario", error);
   });
 };
 
-
 export const verifyToken = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.headers['authorization']?.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ error: 'Acceso denegado' });
+    return res.status(401).json({ error: 'No se proporcionó un token' });
   }
 
-  try {
-    const verified = jwt.verify(token, 'secretKey');
-    req.user = verified;
+  jwt.verify(token, 'secretKey', (err, decoded) => {
+    if (err) {;
+      return res.status(401).json({ error: 'Token inválido' });
+    }
+    req.userId = decoded.userId;
     next();
-  } catch (err) {
-    res.status(400).json({ error: 'Token no válido' });
-  }
+  });
 };
+
