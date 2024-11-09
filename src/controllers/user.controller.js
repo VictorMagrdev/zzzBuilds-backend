@@ -8,11 +8,11 @@ export const getUserById = (req, res) => {
 
   pool.query(`
     SELECT id_user, fullname, user, email, state_id
-    FROM usuarios
+    FROM zenleszz.usuarios
     WHERE id_user = ?
   `, [id_user])
   .then((data) => {
-    const user = data[0];
+    const user = data.rows;
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
@@ -32,19 +32,19 @@ export const registerUser = async (req, res) => {
   }
 
   pool.query(`
-    SELECT * FROM usuarios WHERE user = ? OR email = ?
+    SELECT * FROM zenleszz.usuarios WHERE user = ? OR email = ?
   `, [user, email])
   .then(([existingUser]) => {
 
     if (existingUser.length > 0) {
       return res.status(400).json({ error: 'El correo o el nombre de usuario ya están registrados'});
-    }   
-    
+    }
+
     pool.query(`
-      INSERT INTO usuarios (fullname, user, email, password, state_id)
+      INSERT INTO zenleszz.usuarios (fullname, user, email, password, state_id)
       VALUES (?, ?, ?, ?, ?)
     `, [name, user, email, password, 1])
-    .then(() => {      
+    .then(() => {
       res.status(201).json({ message: 'Usuario registrado exitosamente'});
     })
     .catch(error => {
@@ -59,12 +59,12 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  
+
   pool.query(`
-    SELECT * FROM usuarios WHERE email = ?
+    SELECT * FROM zenleszz.usuarios WHERE email = ?
   `, [email])
   .then((data) => {
-    const user = data[0];
+    const user = data.rows;
 
     if (!user[0].email) {
       return res.status(400).json({ error: 'Correo incorrecto' });
@@ -92,17 +92,17 @@ export const getUserProfile = async (req, res) => {
 
   pool.query(`
     SELECT user, img_profile
-    FROM usuarios
+    FROM zenleszz.usuarios
     WHERE id_user = ?
   `, [userId])
   .then((data) => {
-    const user = data[0];
+    const user = data.rows;
 
     if (!user || user.length === 0) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    res.json(user[0]); 
+    res.json(user[0]);
   })
   .catch(error => {
     errorHandler(res, 500, "Error al obtener los datos del usuario", error);

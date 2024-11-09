@@ -1,31 +1,33 @@
-import * as dotenv from 'dotenv'
-import mysql2 from 'mysql2/promise';
+import * as dotenv from 'dotenv';
+import pg from 'pg';
+const { Pool } = pg;
 
 dotenv.config();
 
-const username = 'root'
-const database = 'zzzbuilds2'
-const password = 'ellenjoe'
-const host = 'localhost'
-const db_port = 3306
+const username = 'postgres';
+const database = 'zzzbuilds';
+const password = '';
+const host = 'localhost';
+const db_port = 5432;
+const schema = 'zenleszz';
 
 const USER = encodeURIComponent(username);
 const PASSWORD = encodeURIComponent(password);
 
-
-export const pool = mysql2.createPool({
+export const pool = new Pool({
     host: host,
     user: USER,
     password: PASSWORD,
     database: database,
-    port: db_port, 
+    port: db_port,
+    searchPath: [schema],
 });
 
 export const validateConnection = async () => {
-    try {
-        await pool.query('SELECT 1 + 1');
-        console.log('Connection success!');
-    } catch (error) {
-        console.error('Error connection:', error);
-    }
+  try {
+    await pool.query('select * from zenleszz.personajes');
+    console.log('¡Conexión exitosa a PostgreSQL!');
+} catch (error) {
+    console.error('Error de conexión:', error);
+}
 };

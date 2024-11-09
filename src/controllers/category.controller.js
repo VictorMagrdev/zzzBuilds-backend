@@ -3,9 +3,9 @@ import { pool } from "../libs/db.js";
 import { errorHandler } from "../helpers/errorHandler.js";
 
 export const getAll = (req, res) => {
-  pool.query('select * from categories')
+  pool.query('select * from zenleszz.categories')
   .then((data) => {
-    const info = data[0]
+    const info = data.rows
     res.json({
       data: info
     })
