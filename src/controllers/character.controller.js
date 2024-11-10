@@ -17,18 +17,15 @@ export const getAll = (req, res) => {
 
 export const getByCharacter = (req, res) => {
   const { id_character } = req.params;
-  console.log("hola")
   pool.query(`
     SELECT * FROM zenleszz.personajes WHERE id = ${id_character}
   `)
     .then((data) => {
-      console.log(data)
       if (data.length === 0) {
         return res.status(404).json({ message: 'Personaje no encontrado' });
       }
       console.log(data)
       const info = data.rows;
-      console.log(info)
       res.json({
         data: info
       });
