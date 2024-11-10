@@ -32,8 +32,8 @@ export const registerUser = async (req, res) => {
   }
 
   pool.query(`
-    SELECT * FROM zenleszz.usuarios WHERE username = ? OR email = ?
-  `, [username, email])
+    SELECT * FROM zenleszz.usuarios WHERE username = ${username} OR email = ${email}
+  `)
     .then(([existingUser]) => {
       if (existingUser.length > 0) {
         return res.status(400).json({ error: 'El correo o el nombre de usuario ya están registrados' });

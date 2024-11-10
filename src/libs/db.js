@@ -4,9 +4,9 @@ const { Pool } = pg;
 
 dotenv.config();
 
-const username = 'postgres';
+const username = 'myserveradmin';
 const database = 'zzzbuilds';
-const password = '';
+const password = 'ellenjoe';
 const host = 'localhost';
 const db_port = 5432;
 const schema = 'zenleszz';
