@@ -9,8 +9,8 @@ export const getUserById = (req, res) => {
   pool.query(`
     SELECT id_user, fullname, username, email, state_id
     FROM zenleszz.usuarios
-    WHERE id_user = ?
-  `, [id_user])
+    WHERE id_user = ${id_user}
+  `)
     .then((data) => {
       const user = data.rows;
       if (!user || user.length === 0) {
@@ -60,8 +60,8 @@ export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   pool.query(`
-    SELECT * FROM zenleszz.usuarios WHERE email = ?
-  `, [email])
+    SELECT * FROM zenleszz.usuarios WHERE email = ${email}
+  `)
     .then((data) => {
       const user = data.rows;
 
@@ -92,8 +92,8 @@ export const getUserProfile = async (req, res) => {
   pool.query(`
     SELECT username, img_profile
     FROM zenleszz.usuarios
-    WHERE id_user = ?
-  `, [userId])
+    WHERE id_user = ${userId}
+  `)
     .then((data) => {
       const user = data.rows;
 
