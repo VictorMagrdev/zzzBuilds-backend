@@ -5,13 +5,14 @@ import jwt from 'jsonwebtoken';
 // Obtener usuario por ID
 export const getUserById = async (req, res) => {
   const { id_user } = req.params;
-
+  
   try {
     const query = `
       SELECT id_user, fullname, username, email, state_id
       FROM zenleszz.usuarios
       WHERE id_user = $1
     `;
+    
     const values = [id_user];
     
     const data = await pool.query(query, values);
@@ -44,14 +45,13 @@ export const registerUser = async (req, res) => {
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ error: 'El correo o el nombre de usuario ya están registrados' });
     }
-
-    const insertUserQuery = `
-      INSERT INTO zenleszz.usuarios (fullname, username, email, password, state_id)
-      VALUES ($1, $2, $3, $4, $5)
-    `;
-    const insertUserValues = [name, username, email, password, 1];
     
-    await pool.query(insertUserQuery, insertUserValues);
+    const insertQuery = {
+      text: 'INSERT INTO zenleszz.usuarios (fullname, username, email, password, state_id) VALUES ($1, $2, $3, $4, $5)',
+      values: [name, username, email, password, 1],
+    }
+    
+    const insertResult = await pool.query(insertQuery);
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
     
   } catch (error) {
