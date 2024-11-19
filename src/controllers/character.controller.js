@@ -15,22 +15,26 @@ export const getAll = (req, res) => {
     })
   }
 
-export const getByCharacter = (req, res) => {
-  const { id_character } = req.params;
-  pool.query(`
-    SELECT * FROM zenleszz.personajes WHERE id = ${id_character}
-  `)
-    .then((data) => {
-      if (data.length === 0) {
+  export const getByCharacter = async (req, res) => {
+    const { id_character } = req.params;
+  
+    try {
+      const query = `
+        SELECT * FROM zenleszz.personajes WHERE id = $1
+      `;
+      const values = [id_character];
+  
+      const data = await pool.query(query, values);
+  
+      if (data.rows.length === 0) {
         return res.status(404).json({ message: 'Personaje no encontrado' });
       }
-      console.log(data)
+  
       const info = data.rows;
-      res.json({
-        data: info
-      });
-    })
-    .catch((error) => {
+      res.json({ data: info });
+  
+    } catch (error) {
       errorHandler(res, 500, "Error al obtener la información de los zenleszz.personajes", error);
-    });
-};
+    }
+  };
+  

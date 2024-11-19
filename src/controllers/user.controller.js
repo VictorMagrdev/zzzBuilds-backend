@@ -3,26 +3,31 @@ import { errorHandler } from "../helpers/errorHandler.js";
 import jwt from 'jsonwebtoken';
 
 // Obtener usuario por ID
-export const getUserById = (req, res) => {
+export const getUserById = async (req, res) => {
   const { id_user } = req.params;
 
-  pool.query(`
-    SELECT id_user, fullname, username, email, state_id
-    FROM zenleszz.usuarios
-    WHERE id_user = ${id_user}
-  `)
-    .then((data) => {
-      const user = data.rows;
-      if (!user || user.length === 0) {
-        return res.status(404).json({ error: 'Usuario no encontrado' });
-      }
+  try {
+    const query = `
+      SELECT id_user, fullname, username, email, state_id
+      FROM zenleszz.usuarios
+      WHERE id_user = $1
+    `;
+    const values = [id_user];
+    
+    const data = await pool.query(query, values);
+    const user = data.rows[0];
+    
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
 
-      res.json(user);
-    })
-    .catch(error => {
-      errorHandler(res, 500, "Error al obtener la información del usuario", error);
-    });
+    res.json(user);
+    
+  } catch (error) {
+    errorHandler(res, 500, "Error al obtener la información del usuario", error);
+  }
 };
+
 
 // Registrar usuario
 export const registerUser = async (req, res) => {
@@ -31,82 +36,86 @@ export const registerUser = async (req, res) => {
     return res.status(400).json({ error: 'Las contraseñas no coinciden' });
   }
 
-  pool.query(`
-    SELECT * FROM zenleszz.usuarios WHERE username = ${username} OR email = ${email}
-  `)
-    .then(([existingUser]) => {
-      if (existingUser.length > 0) {
-        return res.status(400).json({ error: 'El correo o el nombre de usuario ya están registrados' });
-      }
+  try {
+    const checkUserQuery = 'SELECT * FROM zenleszz.usuarios WHERE username = $1 OR email = $2';
+    const checkUserValues = [username, email];
+    const existingUser = await pool.query(checkUserQuery, checkUserValues);
 
-      pool.query(`
-        INSERT INTO zenleszz.usuarios (fullname, username, email, password, state_id)
-        VALUES (?, ?, ?, ?, ?)
-      `, [name, username, email, password, 1])
-        .then(() => {
-          res.status(201).json({ message: 'Usuario registrado exitosamente' });
-        })
-        .catch(error => {
-          errorHandler(res, 500, "Error al registrar el usuario", error);
-        });
-    })
-    .catch(error => {
-      errorHandler(res, 500, "Error al verificar el email o nombre de usuario", error);
-    });
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: 'El correo o el nombre de usuario ya están registrados' });
+    }
+
+    const insertUserQuery = `
+      INSERT INTO zenleszz.usuarios (fullname, username, email, password, state_id)
+      VALUES ($1, $2, $3, $4, $5)
+    `;
+    const insertUserValues = [name, username, email, password, 1];
+    
+    await pool.query(insertUserQuery, insertUserValues);
+    res.status(201).json({ message: 'Usuario registrado exitosamente' });
+    
+  } catch (error) {
+    errorHandler(res, 500, "Error al registrar el usuario", error);
+  }
 };
+
 
 // Iniciar sesión
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
-  pool.query(`
-    SELECT * FROM zenleszz.usuarios WHERE email = ${email}
-  `)
-    .then((data) => {
-      const user = data.rows;
+  try {
+    const query = 'SELECT * FROM zenleszz.usuarios WHERE email = $1';
+    const values = [email];
 
-      if (!user[0]?.email) {
-        return res.status(400).json({ error: 'Correo incorrecto' });
-      }
+    const data = await pool.query(query, values);
+    const user = data.rows[0];
 
-      if (password !== user[0].password) {
-        return res.status(400).json({ error: 'Contraseña incorrecta' });
-      }
+    if (!user) {
+      return res.status(400).json({ error: 'Correo incorrecto' });
+    }
 
-      const token = jwt.sign({ userId: user[0].id_user }, 'secretKey', { expiresIn: '1h' });
+    if (password !== user.password) {
+      return res.status(400).json({ error: 'Contraseña incorrecta' });
+    }
 
-      res.json({
-        token,
-        user: { id: user[0].id_user, fullname: user[0].fullname, username: user[0].username, email: user[0].email }
-      });
-    })
-    .catch(error => {
-      errorHandler(res, 500, "Error al iniciar sesión", error);
+    const token = jwt.sign({ userId: user.id_user }, 'secretKey', { expiresIn: '1h' });
+
+    res.json({
+      token,
+      user: { id: user.id_user, fullname: user.fullname, username: user.username, email: user.email }
     });
+  } catch (error) {
+    errorHandler(res, 500, "Error al iniciar sesión", error);
+  }
 };
 
 // Obtener perfil del usuario
 export const getUserProfile = async (req, res) => {
   const userId = req.userId;
 
-  pool.query(`
-    SELECT username, img_profile
-    FROM zenleszz.usuarios
-    WHERE id_user = ${userId}
-  `)
-    .then((data) => {
-      const user = data.rows;
+  try {
+    const query = `
+      SELECT username, img_profile
+      FROM zenleszz.usuarios
+      WHERE id_user = $1
+    `;
+    const values = [userId];
+    
+    const data = await pool.query(query, values);
+    const user = data.rows[0];
 
-      if (!user || user.length === 0) {
-        return res.status(404).json({ error: 'Usuario no encontrado' });
-      }
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
 
-      res.json(user[0]);
-    })
-    .catch(error => {
-      errorHandler(res, 500, "Error al obtener los datos del usuario", error);
-    });
+    res.json(user);
+    
+  } catch (error) {
+    errorHandler(res, 500, "Error al obtener los datos del usuario", error);
+  }
 };
+
 
 // Verificar token
 export const verifyToken = (req, res, next) => {
