@@ -2,6 +2,7 @@ import express from "express"
 
 import characterRouter from "./character.router.js"
 import userRouter from "./user.router.js"
+import tierListRouter from "./tierlist.router.js"
 
 export const routerApi = (app) => {
   const router = express.Router()
@@ -10,6 +11,7 @@ export const routerApi = (app) => {
   
   router.use('/zenless-zone-zero/characters', characterRouter)
   router.use('/users', userRouter)
+  router.use('/tierlist', tierListRouter)
 
 }
 
