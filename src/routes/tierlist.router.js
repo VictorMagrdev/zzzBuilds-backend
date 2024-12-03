@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAll, getById } from '../controllers/tierlist.controller';
+import { getAll, getById } from '../controllers/tierlist.controller.js';
 
 const router = express.Router();
 
