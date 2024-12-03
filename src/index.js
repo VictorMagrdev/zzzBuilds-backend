@@ -14,6 +14,7 @@ const __dirname = path.dirname(__filename);
 
 app.use('/imagenes/personajes', express.static(path.join(__dirname, 'webscrapping/img_personajes')));
 app.use('/imagenes/usuarios', express.static(path.join(__dirname, 'webscrapping/img_usuarios')));
+app.use('/imagenes/tierlist', express.static(path.join(__dirname, 'webscrapping/img_tierlist')));
 
 app.use(express.json());
 
