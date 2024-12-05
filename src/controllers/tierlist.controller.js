@@ -2,7 +2,7 @@ import { pool } from "../libs/db.js";
 import multer from 'multer';
 import { errorHandler } from "../helpers/errorHandler.js";
 import path from 'path';
-
+import fs from 'fs';
 export const getAll = (req, res) => {
     pool.query('select * from zenleszz.tierlist')
     .then((data) => {
@@ -42,11 +42,16 @@ export const getById = async (req, res) => {
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, 'webscrapping/img_tierlist/');
+      const dir = 'webscrapping/img_tierlist/';
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      cb(null, dir);
     },
     filename: (req, file, cb) => {
       const extname = path.extname(file.originalname);
-      const imageName = `${req.body.name}-${Date.now()}${extname}`;
+      const name = req.body.name || 'default-name';
+      const imageName = `${name}-${Date.now()}${extname}`;
       cb(null, imageName);
     },
   });
@@ -56,10 +61,12 @@ export const getById = async (req, res) => {
   export const create = (req, res) => {
     upload.single('image')(req, res, (err) => {
       if (err) {
+        console.log(err)
         return res.status(500).json({ message: "Error al subir la imagen", error: err });
       }
 
       const { name, usuario } = req.body;
+      console.log({ name, usuario })
 
       const imageId = req.file.filename;
 
