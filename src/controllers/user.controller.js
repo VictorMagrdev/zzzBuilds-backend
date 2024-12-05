@@ -95,14 +95,11 @@ export const getUserProfile = async (req, res) => {
   const userId = req.userId;
 
   try {
-    const query = `
-      SELECT username, img_profile
-      FROM zenleszz.usuarios
-      WHERE id_user = $1
-    `;
+    const query = 'SELECT username, img_profile FROM zenleszz.usuarios WHERE id_user = $1';
     const values = [userId];
     
     const data = await pool.query(query, values);
+
     const user = data.rows[0];
 
     if (!user) {
