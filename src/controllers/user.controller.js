@@ -5,25 +5,25 @@ import jwt from 'jsonwebtoken';
 // Obtener usuario por ID
 export const getUserById = async (req, res) => {
   const { id_user } = req.params;
-  
+
   try {
     const query = `
       SELECT id_user, fullname, username, email, state_id
       FROM zenleszz.usuarios
       WHERE id_user = $1
     `;
-    
+
     const values = [id_user];
-    
+
     const data = await pool.query(query, values);
     const user = data.rows[0];
-    
+
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
     res.json(user);
-    
+
   } catch (error) {
     errorHandler(res, 500, "Error al obtener la información del usuario", error);
   }
@@ -33,10 +33,11 @@ export const getUserById = async (req, res) => {
 // Registrar usuario
 export const registerUser = async (req, res) => {
   const { name, username, email, password, confirmPassword } = req.body;
+  console.log({ name, username, email, password, confirmPassword })
+
   if (password !== confirmPassword) {
     return res.status(400).json({ error: 'Las contraseñas no coinciden' });
   }
-
   try {
     const checkUserQuery = 'SELECT * FROM zenleszz.usuarios WHERE username = $1 OR email = $2';
     const checkUserValues = [username, email];
@@ -45,15 +46,15 @@ export const registerUser = async (req, res) => {
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ error: 'El correo o el nombre de usuario ya están registrados' });
     }
-    
+
     const insertQuery = {
-      text: 'INSERT INTO zenleszz.usuarios (fullname, username, email, password, state_id) VALUES ($1, $2, $3, $4, $5)',
+      text: `INSERT INTO zenleszz.usuarios (fullname, username, email, password, state_id) VALUES ($1, $2, $3, $4, $5)`,
       values: [name, username, email, password, 1],
     }
-    
+
     const insertResult = await pool.query(insertQuery);
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
-    
+
   } catch (error) {
     errorHandler(res, 500, "Error al registrar el usuario", error);
   }
@@ -93,16 +94,15 @@ export const loginUser = async (req, res) => {
 // Obtener perfil del usuario
 export const getUserProfile = async (req, res) => {
   const userId = req.userId;
-
+  const newuserId = parseInt(userId)
   try {
-    const query = `
-      SELECT username, img_profile
-      FROM zenleszz.usuarios
-      WHERE id_user = $1
-    `;
-    const values = [userId];
-    
-    const data = await pool.query(query, values);
+    const insertQuery = {
+      text: 'SELECT username FROM zenleszz.usuarios WHERE id_user = $1',
+      values: [newuserId],
+    }
+    console.log("1")
+    const data = await pool.query(insertQuery);
+    console.log("2")
     const user = data.rows[0];
 
     if (!user) {
@@ -110,17 +110,17 @@ export const getUserProfile = async (req, res) => {
     }
 
     res.json(user);
-    
+
   } catch (error) {
     errorHandler(res, 500, "Error al obtener los datos del usuario", error);
   }
 };
 
 
+
 // Verificar token
 export const verifyToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
-
   if (!token) {
     return res.status(401).json({ error: 'No se proporcionó un token' });
   }
