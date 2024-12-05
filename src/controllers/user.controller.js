@@ -98,17 +98,9 @@ export const getUserProfile = async (req, res) => {
   try {
     const insertQuery = {
       text: 'SELECT username FROM zenleszz.usuarios WHERE id_user = $1',
-<<<<<<< HEAD
-      values: [userId],
-    }
-    
-    const data = await pool.query(insertQuery);
-
-=======
       values: [newuserId],
     }
     const data = await pool.query(insertQuery);
->>>>>>> caba6a6fe468ef9c95e53733c5608bca882f4d0d
     const user = data.rows[0];
 
     if (!user) {
