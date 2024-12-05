@@ -1,5 +1,6 @@
 import mysql.connector
 
+
 def conectar_db():
     conexion = mysql.connector.connect(
         host="localhost",
@@ -8,6 +9,7 @@ def conectar_db():
     )
     cursor = conexion.cursor()
     return conexion, cursor
+
 
 def crear_base_datos_y_tabla(cursor):
     cursor.execute("CREATE DATABASE IF NOT EXISTS zzzBuilds")
@@ -26,12 +28,13 @@ def crear_base_datos_y_tabla(cursor):
     )
     ''')
 
+
 def crear_usuarios(cursor):
     cursor.execute("CREATE DATABASE IF NOT EXISTS zzzBuilds2")
     cursor.execute("USE zzzBuilds2")
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS usuarios (
-        id_user int primary key auto_increment,
+        id_user serial primary key,
         fullname varchar(200) NOT NULL,
         user varchar(200) NOT NULL,
         email varchar(100) UNIQUE NOT NULL,
@@ -50,6 +53,7 @@ def crear_usuarios(cursor):
     ('David Lee', 'davidlee', 'davidlee@example.com', 'password222', 1)
     ''')
 
+
 def almacenar_personaje(cursor, nombre, imagen, estadisticas):
     cursor.execute('''
     INSERT INTO personajes (nombre, imagen, hp, def, atk, impact, anomaly_mastery, anomaly_proficiency)
@@ -57,11 +61,11 @@ def almacenar_personaje(cursor, nombre, imagen, estadisticas):
     ''', (
         nombre,
         imagen,
-        int(estadisticas.get('HP', 0)), 
-        int(estadisticas.get('DEF', 0)), 
-        int(estadisticas.get('ATK', 0)), 
-        int(estadisticas.get('Impact', 0)), 
-        int(estadisticas.get('Anomaly Mastery', 0)), 
+        int(estadisticas.get('HP', 0)),
+        int(estadisticas.get('DEF', 0)),
+        int(estadisticas.get('ATK', 0)),
+        int(estadisticas.get('Impact', 0)),
+        int(estadisticas.get('Anomaly Mastery', 0)),
         int(estadisticas.get('Anomaly Proficiency', 0))
     ))
 

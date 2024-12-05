@@ -65,15 +65,15 @@ export const getById = async (req, res) => {
         return res.status(500).json({ message: "Error al subir la imagen", error: err });
       }
 
-      const { name, usuario } = req.body;
-      console.log({ name, usuario })
+      const { nombre, usuario } = req.body;
 
-      const imageId = req.file.filename;
-
+      const imagen = req.file.filename;
+      const userId = req.userId;
+      const user_id = parseInt(userId)
       pool.query(
-        `INSERT INTO zenleszz.tierlist (name, usuario, imageId)
-         VALUES ($1, $2, $3) RETURNING id, name, usuario, imageId, created_at`,
-        [name, usuario, imageId],
+        `INSERT INTO zenleszz.tierlist (nombre, imagen, user_id)
+         VALUES ($1, $2, $3) RETURNING id created_at`,
+        [nombre, imagen, user_id],
         (err, data) => {
           if (err) {
             errorHandler(res, 500, "Error al crear el tier list", err);
