@@ -64,8 +64,10 @@ export const getById = async (req, res) => {
         console.log(err)
         return res.status(500).json({ message: "Error al subir la imagen", error: err });
       }
-      const { name, usuario } = req.body;
-
+      console.log(1)
+      const name = req.body["nombre"];
+      console.log("register")
+      console.log(name)
       const imagen = req.file.filename;
       const userId = req.userId;
       const user_id = parseInt(userId)
