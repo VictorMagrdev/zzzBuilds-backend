@@ -42,7 +42,7 @@ export const getById = async (req, res) => {
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      const dir = 'webscrapping/img_tierlist/';
+      const dir = 'src/webscrapping/img_tierlist';
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
@@ -64,18 +64,19 @@ export const getById = async (req, res) => {
         console.log(err)
         return res.status(500).json({ message: "Error al subir la imagen", error: err });
       }
-
-      const { nombre, usuario } = req.body;
+      const { name, usuario } = req.body;
 
       const imagen = req.file.filename;
       const userId = req.userId;
       const user_id = parseInt(userId)
+      console.log({name, imagen, user_id})
       pool.query(
         `INSERT INTO zenleszz.tierlist (nombre, imagen, user_id)
          VALUES ($1, $2, $3) RETURNING id created_at`,
-        [nombre, imagen, user_id],
+        [name, imagen, user_id],
         (err, data) => {
           if (err) {
+            console.log(err)
             errorHandler(res, 500, "Error al crear el tier list", err);
             return;
           }
